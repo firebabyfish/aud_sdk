@@ -1,0 +1,19 @@
+{
+    "files.exclude": {
+        "sample": true,
+        "out": true,
+        "middleware/lc3plus/fixed_point": true,
+    },
+    "search.exclude": {
+        "sample": true,
+        "out": true,
+    },
+    "files.watcherExclude": {
+        "sample": true,
+        "out": true,
+    },
+    "files.associations": {
+        "ch32v30x.h": "c",
+        "core_riscv.h": "c"
+    },
+}

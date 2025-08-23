@@ -1,0 +1,24 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "rtthread.h": "c",
+            "ch58x_common.h": "c",
+            "ch58x_clk.h": "c",
+            "core_riscv.h": "c",
+            "ch58x_uart.h": "c",
+            "stdint.h": "c",
+            "string.h": "c",
+            "ch585sfr.h": "c",
+            "isp585.h": "c",
+            "debug.h": "c",
+            "freertos.h": "c",
+            "functions.h": "c",
+            "defines.h": "c"
+        }
+    }
+}

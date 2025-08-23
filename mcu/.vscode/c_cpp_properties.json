@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "name": "mcu",
+            "defines": [],
+            "compilerPath": "gcc",
+            "cStandard": "c99",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "linux-gcc-x64",
+            "includePath": [
+                "middleware/CherryUSB/common",
+                "middleware/CherryUSB/core",
+                "middleware/CherryUSB/class/hub",
+                "middleware/CherryUSB/class/cdc",
+                "middleware/CherryUSB/class/hid",
+                "middleware/CherryUSB/class/msc",
+                "middleware/CherryUSB/class/audio",
+                "middleware/CherryUSB/class/video",
+                "middleware/CherryUSB/class/wireless",
+                "middleware/CherryUSB/class/midi",
+                "middleware/CherryUSB/class/adb",
+                "middleware/CherryUSB/class/dfu",
+                "middleware/CherryUSB/class/vendor/net",
+                "middleware/CherryUSB/class/vendor/serial",
+                "middleware/CherryUSB/class/vendor/wifi",
+                "middleware/CherryUSB/class/aoa",
+                "middleware/FreeRTOS/portable/GCC/RISC-V",
+                "middleware/FreeRTOS/include",
+                "platform/ch585/StdPeriphDriver/inc",
+                "platform/ch585/RVMSIS",
+                "include"
+            ]
+        }
+    ],
+    "version": 4
+}

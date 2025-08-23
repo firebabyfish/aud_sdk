@@ -1,0 +1,1 @@
+gcc -std=c99 -fPIC -pedantic -Wcast-qual -Wall -W -Wextra -Wno-long-long -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Iinc -Ifft -g3 -O0   -lm -g -g3

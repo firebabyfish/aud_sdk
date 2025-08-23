@@ -1,0 +1,26 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "rtthread.h": "c",
+            "ch58x_common.h": "c",
+            "ch58x_clk.h": "c",
+            "core_riscv.h": "c",
+            "ch58x_uart.h": "c",
+            "stdint.h": "c",
+            "string.h": "c",
+            "ch585sfr.h": "c",
+            "isp585.h": "c",
+            "usb_errno.h": "c",
+            "usb_def.h": "c",
+            "usbd_core.h": "c",
+            "usbh_audio.h": "c",
+            "usb_audio.h": "c",
+            "ch58x_usbdev.h": "c"
+        }
+    }
+}

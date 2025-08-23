@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "name": "mcu",
+            "defines": [],
+            "compilerPath": "gcc",
+            "cStandard": "c99",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "linux-gcc-x64",
+            "includePath": [
+                "platform/ch32v30x/Core",
+                "platform/ch32v30x/System",
+                "platform/ch32v30x/Debug",
+                "platform/ch32v30x/drivers",
+                "platform/ch32v30x/Peripheral/inc",
+                "middleware/FreeRTOS/include",
+                "middleware/FreeRTOS/portable/GCC/RISC-V",
+                "middleware/FreeRTOS/portable/GCC/RISC-V/chip_specific_extensions/RV32I_PFIC_no_extensions",
+                "middleware/lc3plus/floating_point/inc",
+                "middleware/lc3plus/floating_point/fft",
+                "include"
+            ]
+        }
+    ],
+    "version": 4
+}
