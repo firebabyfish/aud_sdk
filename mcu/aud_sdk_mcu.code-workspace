@@ -20,7 +20,18 @@
             "usbd_core.h": "c",
             "usbh_audio.h": "c",
             "usb_audio.h": "c",
-            "ch58x_usbdev.h": "c"
+            "ch58x_usbdev.h": "c",
+            "usbd_audio.h": "c",
+            "usb_ch58x_usbfs_reg.h": "c",
+            "cstdio": "c",
+            "usb_util.h": "c",
+            "usb_config.h": "c",
+            "clock.h": "c",
+            "log.h": "c",
+            "bsp_timer.h": "c",
+            "app_delay.h": "c",
+            "elog.h": "c",
+            "bsp_uart.h": "c"
         }
     }
 }

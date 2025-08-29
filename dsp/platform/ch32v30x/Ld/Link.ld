@@ -4,6 +4,7 @@ __stack_size = 2048;
 
 PROVIDE( _stack_size = __stack_size );
 
+
 MEMORY
 {
 /* CH32V30x_D8C - CH32V305RB-CH32V305FB
@@ -24,9 +25,10 @@ MEMORY
    FLASH-288K + RAM-32K  
    FLASH-128K + RAM-192K  
 */
-	FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K
-	RAM (xrw) : ORIGIN = 0x20000000, LENGTH = 64K
+	FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 288K
+	RAM (xrw) : ORIGIN = 0x20000000, LENGTH = 32K
 }
+
 
 SECTIONS
 {
@@ -54,32 +56,7 @@ SECTIONS
 		*(.rodata)
 		*(.rodata*)
 		*(.gnu.linkonce.t.*)
-		
-		 /* section information for finsh shell */
-    . = ALIGN(4);
-    __fsymtab_start = .;
-    KEEP(*(FSymTab))
-    __fsymtab_end = .;
-    . = ALIGN(4);
-    __vsymtab_start = .;
-    KEEP(*(VSymTab))
-    __vsymtab_end = .;
-    . = ALIGN(4);
-    
-    /* section information for initial. */
-    . = ALIGN(4);
-    __rt_init_start = .;
-    KEEP(*(SORT(.rti_fn*)))
-    __rt_init_end = .;
-    . = ALIGN(4);
-
-    /* section information for modules */
-    . = ALIGN(4);
-    __rtmsymtab_start = .;
-    KEEP(*(RTMSymTab))
-    __rtmsymtab_end = .;
 		. = ALIGN(4);
-			
 	} >FLASH AT>FLASH 
 
 	.fini :

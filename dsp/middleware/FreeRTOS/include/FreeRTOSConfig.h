@@ -70,7 +70,9 @@
 
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
-#include "debug.h"
+
+#include "stdio.h"
+#include "ch32v30x.h"
 
 /*-----------------------------------------------------------
  * Application specific definitions.

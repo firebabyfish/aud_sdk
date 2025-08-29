@@ -29,7 +29,7 @@ C_INCLUDES += \
 	-I$(CH585_STD_DIR)/StdPeriphDriver/inc
 
 ifeq ($(OS), none)
-ASM_SOURCES += $(CH585_STD_DIR)/Startup/Startup_CH585.S
+ASM_SOURCES += $(CH585_STD_DIR)/Startup/startup_CH585.S
 LDSCRIPT += $(CH585_STD_DIR)/Ld/Link.ld
 else ifeq ($(OS), rtthread)
 ASM_SOURCES += $(CH585_STD_DIR)/Startup/Startup_CH585_RTThread.S

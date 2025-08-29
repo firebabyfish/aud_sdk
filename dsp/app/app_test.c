@@ -4,11 +4,18 @@
 /* Global Variable */
 #define Len 10
 
-u16 I2S2_Tx[Len] = {0x1111, 0x2222, 0x3333, 0x4444, 0x5555, 0x6666, 0x7777, 0x8888, 0x9999, 0xAAAA};
+u16 I2S2_Tx[Len] = {0x0000, 0x2222, 0x3333, 0x0000, 0x5555, 0x6666, 0x7777, 0x8888, 0x9999, 0x0000};
 u16 I2S3_Rx[Len];
 
 
-void aud_i2s2_init(void)
+/*********************************************************************
+ * @fn      I2S2_Init
+ *
+ * @brief   Init I2S2
+ *
+ * @return  none
+ */
+void I2S2_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure = {0};
     I2S_InitTypeDef I2S_InitStructure   = {0};
@@ -31,20 +38,28 @@ void aud_i2s2_init(void)
     I2S_InitStructure.I2S_DataFormat = I2S_DataFormat_16b;
     I2S_InitStructure.I2S_MCLKOutput = I2S_MCLKOutput_Disable;
     I2S_InitStructure.I2S_AudioFreq  = I2S_AudioFreq_48k;
-    I2S_InitStructure.I2S_CPOL       = I2S_CPOL_High;
+    I2S_InitStructure.I2S_CPOL       = I2S_CPOL_Low;
     I2S_Init(SPI2, &I2S_InitStructure);
 
     SPI_I2S_DMACmd(SPI2, SPI_I2S_DMAReq_Tx, ENABLE);
     I2S_Cmd(SPI2, ENABLE);
 }
 
-void aud_i2s3_init(void)
+/*********************************************************************
+ * @fn      I2S3_Init
+ *
+ * @brief   Init I2S2
+ *
+ * @return  none
+ */
+void I2S3_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure = {0};
     I2S_InitTypeDef I2S_InitStructure   = {0};
 
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO | RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, ENABLE);
+
 
     GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_15;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
@@ -66,7 +81,19 @@ void aud_i2s3_init(void)
     I2S_Cmd(SPI3, ENABLE);
 }
 
-void aud_i2s2_dma_init(DMA_Channel_TypeDef *DMA_CHx, u32 ppadr, u32 memadr, u16 bufsize)
+/*********************************************************************
+ * @fn      DMA_Tx_Init
+ *
+ * @brief   Initializes the DMAy Channelx configuration.
+ *
+ * @param   DMA_CHx - x can be 1 to 7.
+ *          ppadr - Peripheral base address.
+ *          memadr - Memory base address.
+ *          bufsize - DMA channel buffer size.
+ *
+ * @return  none
+ */
+void DMA_Tx_Init(DMA_Channel_TypeDef *DMA_CHx, u32 ppadr, u32 memadr, u16 bufsize)
 {
     DMA_InitTypeDef DMA_InitStructure = {0};
 
@@ -88,7 +115,19 @@ void aud_i2s2_dma_init(DMA_Channel_TypeDef *DMA_CHx, u32 ppadr, u32 memadr, u16 
     DMA_Init(DMA_CHx, &DMA_InitStructure);
 }
 
-void aud_i2s3_dma_init(DMA_Channel_TypeDef *DMA_CHx, u32 ppadr, u32 memadr, u16 bufsize)
+/*********************************************************************
+ * @fn      DMA_Rx_Init
+ *
+ * @brief   Initializes the I2S3 DMA Channelx configuration.
+ *
+ * @param   DMA_CHx - x can be 1 to 7.
+ *          ppadr - Peripheral base address.
+ *          memadr - Memory base address.
+ *          bufsize - DMA channel buffer size.
+ *
+ * @return  none
+ */
+void DMA_Rx_Init(DMA_Channel_TypeDef *DMA_CHx, u32 ppadr, u32 memadr, u16 bufsize)
 {
     DMA_InitTypeDef DMA_InitStructure = {0};
 
@@ -110,28 +149,39 @@ void aud_i2s3_dma_init(DMA_Channel_TypeDef *DMA_CHx, u32 ppadr, u32 memadr, u16 
     DMA_Init(DMA_CHx, &DMA_InitStructure);
 }
 
-void aud_i2s_init(void)
+/*********************************************************************
+ * @fn      main
+ *
+ * @brief   Main program.
+ *
+ * @return  none
+ */
+void app_test(void)
 {
+    u32 i;
+
     SPI_I2S_DeInit(SPI2);
-    SPI_I2S_DeInit(SPI3);
+    // SPI_I2S_DeInit(SPI3);
 
-    aud_i2s2_init();
-    aud_i2s3_init();
+    I2S2_Init();
+    // I2S3_Init();
 
-    aud_i2s2_dma_init(DMA1_Channel5, (u32)&SPI2->DATAR, (u32)I2S2_Tx, Len);
-    aud_i2s3_dma_init(DMA2_Channel1, (u32)&SPI3->DATAR, (u32)I2S3_Rx, Len);
+    // DMA_Rx_Init(DMA2_Channel1, (u32)&SPI3->DATAR, (u32)I2S3_Rx, Len);
+    DMA_Tx_Init(DMA1_Channel5, (u32)&SPI2->DATAR, (u32)I2S2_Tx, Len);
 
-    DMA_Cmd(DMA2_Channel1, ENABLE);
+    // DMA_Cmd(DMA2_Channel1, ENABLE);
     DMA_Cmd(DMA1_Channel5, ENABLE);
 
     while ((!DMA_GetFlagStatus(DMA1_FLAG_TC5))) {};
-    while ((!DMA_GetFlagStatus(DMA2_FLAG_TC1))) {};
+    // while ((!DMA_GetFlagStatus(DMA2_FLAG_TC1))) {};
 
-    I2S_Cmd(SPI3, DISABLE);
+    // I2S_Cmd(SPI3, DISABLE);
     I2S_Cmd(SPI2, DISABLE);
 
     printf("Rx data:\r\n");
-    for (int i = 0; i < Len; i++) {
+    for (i = 0; i < Len; i++) {
         printf("%08x %08x\r\n", I2S2_Tx[i], I2S3_Rx[i]);
     }
+
+    while (1);
 }

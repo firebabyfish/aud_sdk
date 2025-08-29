@@ -1,5 +1,16 @@
+/*
+ * Copyright (c) 2024, sakumisu
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+#define LOG_TAG "bsp_usb"
+
 #include "usbd_core.h"
 #include "usbd_audio.h"
+
+#include "CH58x_common.h"
+#include "app_delay.h"
+
 
 #define USING_FEEDBACK 0
 
@@ -25,11 +36,11 @@
 #define AUDIO_IN_CLOCK_ID  0x05
 #define AUDIO_IN_FU_ID     0x07
 
-#define AUDIO_OUT_MAX_FREQ 48000
+#define AUDIO_OUT_MAX_FREQ 96000
 #define AUDIO_IN_MAX_FREQ  16000
 
-#define HALF_WORD_BYTES 2  //2 half word (one channel)
-#define SAMPLE_BITS     16 //16 bit per channel
+#define HALF_WORD_BYTES 2   //2 half word (one channel)
+#define SAMPLE_BITS     16  //16 bit per channel
 
 #define BMCONTROL (AUDIO_V2_FU_CONTROL_MUTE | AUDIO_V2_FU_CONTROL_VOLUME)
 
@@ -133,9 +144,8 @@
 
 #ifdef CONFIG_USBDEV_ADVANCE_DESC
 static const uint8_t device_descriptor[] = {
-    USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0001, 0x01)
-};
-
+    USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0001, 0x01)};
+uint16_t size[USB_AUDIO_CONFIG_DESC_SIZ];
 static const uint8_t config_descriptor[] = {
     USB_CONFIG_DESCRIPTOR_INIT(USB_AUDIO_CONFIG_DESC_SIZ, 0x03, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     AUDIO_V2_AC_DESCRIPTOR_INIT(0x00, 0x03, AUDIO_AC_SIZ, AUDIO_CATEGORY_UNDEF, 0x00, 0x00),
@@ -152,7 +162,7 @@ static const uint8_t config_descriptor[] = {
 #else
     AUDIO_V2_AS_FEEDBACK_DESCRIPTOR_INIT(0x01, 0x02, OUT_CHANNEL_NUM, OUTPUT_CH_ENABLE, HALF_WORD_BYTES, SAMPLE_BITS, AUDIO_OUT_EP, 0x09, AUDIO_OUT_PACKET, EP_INTERVAL, AUDIO_OUT_FEEDBACK_EP),
 #endif
-    AUDIO_V2_AS_DESCRIPTOR_INIT(0x02, 0x08, IN_CHANNEL_NUM, INPUT_CH_ENABLE, HALF_WORD_BYTES, SAMPLE_BITS, AUDIO_IN_EP, 0x05, (AUDIO_IN_PACKET + 4), EP_INTERVAL)
+    AUDIO_V2_AS_DESCRIPTOR_INIT(0x02, 0x08, IN_CHANNEL_NUM, INPUT_CH_ENABLE, HALF_WORD_BYTES, SAMPLE_BITS, AUDIO_IN_EP, 0x05, (AUDIO_IN_PACKET + 4), EP_INTERVAL),
 };
 
 static const uint8_t device_quality_descriptor[] = {
@@ -172,10 +182,10 @@ static const uint8_t device_quality_descriptor[] = {
 };
 
 static const char *string_descriptors[] = {
-    (const char[]){ 0x09, 0x04 }, /* Langid */
-    "CherryUSB",                  /* Manufacturer */
-    "CherryUSB UAC DEMO",         /* Product */
-    "2022123456",                 /* Serial Number */
+    (const char[]){0x09, 0x04}, /* Langid */
+    "CherryUSB",                /* Manufacturer */
+    "CherryUSB UAC DEMO",       /* Product */
+    "2022123456",               /* Serial Number */
 };
 
 static const uint8_t *device_descriptor_callback(uint8_t speed)
@@ -202,107 +212,10 @@ static const char *string_descriptor_callback(uint8_t speed, uint8_t index)
 }
 
 const struct usb_descriptor audio_v2_descriptor = {
-    .device_descriptor_callback = device_descriptor_callback,
-    .config_descriptor_callback = config_descriptor_callback,
+    .device_descriptor_callback         = device_descriptor_callback,
+    .config_descriptor_callback         = config_descriptor_callback,
     .device_quality_descriptor_callback = device_quality_descriptor_callback,
-    .string_descriptor_callback = string_descriptor_callback
-};
-#else
-uint8_t audio_v2_descriptor[] = {
-    USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0001, 0x01),
-    USB_CONFIG_DESCRIPTOR_INIT(USB_AUDIO_CONFIG_DESC_SIZ, 0x03, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
-    AUDIO_V2_AC_DESCRIPTOR_INIT(0x00, 0x03, AUDIO_AC_SIZ, AUDIO_CATEGORY_UNDEF, 0x00, 0x00),
-    AUDIO_V2_AC_CLOCK_SOURCE_DESCRIPTOR_INIT(0x01, 0x03, 0x03),
-    AUDIO_V2_AC_INPUT_TERMINAL_DESCRIPTOR_INIT(0x02, AUDIO_TERMINAL_STREAMING, 0x01, OUT_CHANNEL_NUM, OUTPUT_CH_ENABLE, 0x0000),
-    AUDIO_V2_AC_FEATURE_UNIT_DESCRIPTOR_INIT(0x03, 0x02, OUTPUT_CTRL),
-    AUDIO_V2_AC_OUTPUT_TERMINAL_DESCRIPTOR_INIT(0x04, AUDIO_OUTTERM_SPEAKER, 0x03, 0x01, 0x0000),
-    AUDIO_V2_AC_CLOCK_SOURCE_DESCRIPTOR_INIT(0x05, 0x03, 0x03),
-    AUDIO_V2_AC_INPUT_TERMINAL_DESCRIPTOR_INIT(0x06, AUDIO_INTERM_MIC, 0x05, IN_CHANNEL_NUM, INPUT_CH_ENABLE, 0x0000),
-    AUDIO_V2_AC_FEATURE_UNIT_DESCRIPTOR_INIT(0x07, 0x06, INPUT_CTRL),
-    AUDIO_V2_AC_OUTPUT_TERMINAL_DESCRIPTOR_INIT(0x08, AUDIO_TERMINAL_STREAMING, 0x07, 0x05, 0x0000),
-#if USING_FEEDBACK == 0
-    AUDIO_V2_AS_DESCRIPTOR_INIT(0x01, 0x02, OUT_CHANNEL_NUM, OUTPUT_CH_ENABLE, HALF_WORD_BYTES, SAMPLE_BITS, AUDIO_OUT_EP, 0x09, AUDIO_OUT_PACKET, EP_INTERVAL),
-#else
-    AUDIO_V2_AS_FEEDBACK_DESCRIPTOR_INIT(0x01, 0x02, OUT_CHANNEL_NUM, OUTPUT_CH_ENABLE, HALF_WORD_BYTES, SAMPLE_BITS, AUDIO_OUT_EP, 0x09, AUDIO_OUT_PACKET, EP_INTERVAL, AUDIO_OUT_FEEDBACK_EP),
-#endif
-    AUDIO_V2_AS_DESCRIPTOR_INIT(0x02, 0x08, IN_CHANNEL_NUM, INPUT_CH_ENABLE, HALF_WORD_BYTES, SAMPLE_BITS, AUDIO_IN_EP, 0x05, (AUDIO_IN_PACKET + 4), EP_INTERVAL),
-    ///////////////////////////////////////
-    /// string0 descriptor
-    ///////////////////////////////////////
-    USB_LANGID_INIT(USBD_LANGID_STRING),
-    ///////////////////////////////////////
-    /// string1 descriptor
-    ///////////////////////////////////////
-    0x14,                       /* bLength */
-    USB_DESCRIPTOR_TYPE_STRING, /* bDescriptorType */
-    'C', 0x00,                  /* wcChar0 */
-    'h', 0x00,                  /* wcChar1 */
-    'e', 0x00,                  /* wcChar2 */
-    'r', 0x00,                  /* wcChar3 */
-    'r', 0x00,                  /* wcChar4 */
-    'y', 0x00,                  /* wcChar5 */
-    'U', 0x00,                  /* wcChar6 */
-    'S', 0x00,                  /* wcChar7 */
-    'B', 0x00,                  /* wcChar8 */
-    ///////////////////////////////////////
-    /// string2 descriptor
-    ///////////////////////////////////////
-    0x26,                       /* bLength */
-    USB_DESCRIPTOR_TYPE_STRING, /* bDescriptorType */
-    'C', 0x00,                  /* wcChar0 */
-    'h', 0x00,                  /* wcChar1 */
-    'e', 0x00,                  /* wcChar2 */
-    'r', 0x00,                  /* wcChar3 */
-    'r', 0x00,                  /* wcChar4 */
-    'y', 0x00,                  /* wcChar5 */
-    'U', 0x00,                  /* wcChar6 */
-    'S', 0x00,                  /* wcChar7 */
-    'B', 0x00,                  /* wcChar8 */
-    ' ', 0x00,                  /* wcChar9 */
-    'U', 0x00,                  /* wcChar10 */
-    'A', 0x00,                  /* wcChar11 */
-    'C', 0x00,                  /* wcChar12 */
-    ' ', 0x00,                  /* wcChar13 */
-    'D', 0x00,                  /* wcChar14 */
-    'E', 0x00,                  /* wcChar15 */
-    'M', 0x00,                  /* wcChar16 */
-    'O', 0x00,                  /* wcChar17 */
-    ///////////////////////////////////////
-    /// string3 descriptor
-    ///////////////////////////////////////
-    0x16,                       /* bLength */
-    USB_DESCRIPTOR_TYPE_STRING, /* bDescriptorType */
-    '2', 0x00,                  /* wcChar0 */
-    '0', 0x00,                  /* wcChar1 */
-    '2', 0x00,                  /* wcChar2 */
-    '1', 0x00,                  /* wcChar3 */
-    '0', 0x00,                  /* wcChar4 */
-    '3', 0x00,                  /* wcChar5 */
-    '1', 0x00,                  /* wcChar6 */
-    '0', 0x00,                  /* wcChar7 */
-    '0', 0x00,                  /* wcChar8 */
-#if USING_FEEDBACK == 0
-    '3', 0x00,                  /* wcChar9 */
-#else
-    '4', 0x00, /* wcChar9 */
-#endif
-#ifdef CONFIG_USB_HS
-    ///////////////////////////////////////
-    /// device qualifier descriptor
-    ///////////////////////////////////////
-    0x0a,
-    USB_DESCRIPTOR_TYPE_DEVICE_QUALIFIER,
-    0x00,
-    0x02,
-    0x00,
-    0x00,
-    0x00,
-    0x40,
-    0x00,
-    0x00,
-#endif
-    0x00
-};
+    .string_descriptor_callback         = string_descriptor_callback};
 #endif
 
 static const uint8_t speaker_default_sampling_freq_table[] = {
@@ -321,21 +234,21 @@ static const uint8_t speaker_default_sampling_freq_table[] = {
     AUDIO_SAMPLE_FREQ_4B(0x00),
     AUDIO_SAMPLE_FREQ_4B(96000),
     AUDIO_SAMPLE_FREQ_4B(96000),
-    AUDIO_SAMPLE_FREQ_4B(0x00)
+    AUDIO_SAMPLE_FREQ_4B(0x00),
 };
 
 static const uint8_t mic_default_sampling_freq_table[] = {
     AUDIO_SAMPLE_FREQ_NUM(1),
     AUDIO_SAMPLE_FREQ_4B(16000),
     AUDIO_SAMPLE_FREQ_4B(16000),
-    AUDIO_SAMPLE_FREQ_4B(0x00)
+    AUDIO_SAMPLE_FREQ_4B(0x00),
 };
 
 USB_NOCACHE_RAM_SECTION USB_MEM_ALIGNX uint8_t read_buffer[AUDIO_OUT_PACKET];
 USB_NOCACHE_RAM_SECTION USB_MEM_ALIGNX uint8_t write_buffer[AUDIO_IN_PACKET];
 
-volatile bool tx_flag = 0;
-volatile bool rx_flag = 0;
+volatile bool tx_flag         = 0;
+volatile bool rx_flag         = 0;
 volatile bool ep_tx_busy_flag = false;
 volatile uint32_t s_mic_sample_rate;
 volatile uint32_t s_speaker_sample_rate;
@@ -344,22 +257,29 @@ static void usbd_event_handler(uint8_t busid, uint8_t event)
 {
     switch (event) {
         case USBD_EVENT_RESET:
+            USB_LOG_INFO("USBD_EVENT_RESET");
             break;
         case USBD_EVENT_CONNECTED:
+            USB_LOG_INFO("USBD_EVENT_CONNECTED");
             break;
         case USBD_EVENT_DISCONNECTED:
+            USB_LOG_INFO("USBD_EVENT_DISCONNECTED");
             break;
         case USBD_EVENT_RESUME:
+            USB_LOG_INFO("USBD_EVENT_RESUME");
             break;
         case USBD_EVENT_SUSPEND:
+            USB_LOG_INFO("USBD_EVENT_SUSPEND");
             break;
         case USBD_EVENT_CONFIGURED:
+            USB_LOG_INFO("USBD_EVENT_CONFIGURED");
             break;
         case USBD_EVENT_SET_REMOTE_WAKEUP:
+            USB_LOG_INFO("USBD_EVENT_SET_REMOTE_WAKEUP");
             break;
         case USBD_EVENT_CLR_REMOTE_WAKEUP:
+            USB_LOG_INFO("USBD_EVENT_CLR_REMOTE_WAKEUP");
             break;
-
         default:
             break;
     }
@@ -367,6 +287,7 @@ static void usbd_event_handler(uint8_t busid, uint8_t event)
 
 void usbd_audio_open(uint8_t busid, uint8_t intf)
 {
+    USB_LOG_DBG("USBD_EVENT_CLR_REMOTE_WAKEUP");
     if (intf == 1) {
         rx_flag = 1;
         /* setup first out ep read transfer */
@@ -381,10 +302,10 @@ void usbd_audio_open(uint8_t busid, uint8_t intf)
 #endif
         usbd_ep_start_write(busid, AUDIO_OUT_FEEDBACK_EP, s_speaker_feedback_buffer, FEEDBACK_ENDP_PACKET_SIZE);
 #endif
-        USB_LOG_RAW("OPEN1\r\n");
+        USB_LOG_RAW("Open rx");
     } else {
         tx_flag = 1;
-        USB_LOG_RAW("OPEN2\r\n");
+        // USB_LOG_RAW("Open tx");
     }
 }
 
@@ -392,10 +313,10 @@ void usbd_audio_close(uint8_t busid, uint8_t intf)
 {
     if (intf == 1) {
         rx_flag = 0;
-        USB_LOG_RAW("CLOSE1\r\n");
+        // USB_LOG_RAW("Close rx");
     } else {
         tx_flag = 0;
-        USB_LOG_RAW("CLOSE2\r\n");
+        // USB_LOG_RAW("Close tx");
     }
 }
 
@@ -461,20 +382,19 @@ void usbd_audio_iso_out_feedback_callback(uint8_t busid, uint8_t ep, uint32_t nb
 #endif
 
 static struct usbd_endpoint audio_out_ep = {
-    .ep_cb = usbd_audio_iso_out_callback,
-    .ep_addr = AUDIO_OUT_EP
+    .ep_cb   = usbd_audio_iso_out_callback,
+    .ep_addr = AUDIO_OUT_EP,
 };
 
 static struct usbd_endpoint audio_in_ep = {
-    .ep_cb = usbd_audio_iso_in_callback,
-    .ep_addr = AUDIO_IN_EP
+    .ep_cb   = usbd_audio_iso_in_callback,
+    .ep_addr = AUDIO_IN_EP,
 };
 
 #if USING_FEEDBACK == 1
 static struct usbd_endpoint audio_out_feedback_ep = {
-    .ep_cb = usbd_audio_iso_out_feedback_callback,
-    .ep_addr = AUDIO_OUT_FEEDBACK_EP
-};
+    .ep_cb   = usbd_audio_iso_out_feedback_callback,
+    .ep_addr = AUDIO_OUT_FEEDBACK_EP};
 #endif
 
 struct usbd_interface intf0;
@@ -482,18 +402,18 @@ struct usbd_interface intf1;
 struct usbd_interface intf2;
 
 struct audio_entity_info audio_entity_table[] = {
-    { .bEntityId = AUDIO_OUT_CLOCK_ID,
-      .bDescriptorSubtype = AUDIO_CONTROL_CLOCK_SOURCE,
-      .ep = AUDIO_OUT_EP },
-    { .bEntityId = AUDIO_OUT_FU_ID,
-      .bDescriptorSubtype = AUDIO_CONTROL_FEATURE_UNIT,
-      .ep = AUDIO_OUT_EP },
-    { .bEntityId = AUDIO_IN_CLOCK_ID,
-      .bDescriptorSubtype = AUDIO_CONTROL_CLOCK_SOURCE,
-      .ep = AUDIO_IN_EP },
-    { .bEntityId = AUDIO_IN_FU_ID,
-      .bDescriptorSubtype = AUDIO_CONTROL_FEATURE_UNIT,
-      .ep = AUDIO_IN_EP },
+    {.bEntityId          = AUDIO_OUT_CLOCK_ID,
+     .bDescriptorSubtype = AUDIO_CONTROL_CLOCK_SOURCE,
+     .ep                 = AUDIO_OUT_EP},
+    {.bEntityId          = AUDIO_OUT_FU_ID,
+     .bDescriptorSubtype = AUDIO_CONTROL_FEATURE_UNIT,
+     .ep                 = AUDIO_OUT_EP},
+    {.bEntityId          = AUDIO_IN_CLOCK_ID,
+     .bDescriptorSubtype = AUDIO_CONTROL_CLOCK_SOURCE,
+     .ep                 = AUDIO_IN_EP},
+    {.bEntityId          = AUDIO_IN_FU_ID,
+     .bDescriptorSubtype = AUDIO_CONTROL_FEATURE_UNIT,
+     .ep                 = AUDIO_IN_EP},
 };
 
 void audio_v2_init(uint8_t busid, uintptr_t reg_base)
@@ -528,5 +448,18 @@ void audio_v2_test(uint8_t busid)
         }
     }
     if (rx_flag) {
+        // usbd_ep_start_read(busid, AUDIO_OUT_EP, read_buffer, AUDIO_OUT_PACKET);
+        // USB_LOG_INFO("Rx data: [0]0x%02X, [41]0x%02X, [82]0x%02X...\r\n", read_buffer[0], read_buffer[41], read_buffer[82]);
     }
+}
+
+void bsp_usb_audio_init(void)
+{
+    audio_v2_init(0, 0x40008000);
+    app_delay_ms(100);
+}
+
+void usb_dc_low_level_init(void)
+{
+    PFIC_EnableIRQ(USB_IRQn);
 }

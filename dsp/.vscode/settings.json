@@ -2,18 +2,33 @@
     "files.exclude": {
         "sample": true,
         "out": true,
-        "middleware/lc3plus/fixed_point": true,
+        "middleware/lc3plus": true,
+        "middleware/FreeRTOS": true,
+        "middleware/rtthread": true,
+        "middleware/EasyLogger/demo": true,
+        "middleware/EasyLogger/docs": true,
     },
     "search.exclude": {
         "sample": true,
         "out": true,
+        "middleware/lc3plus": true,
+        "middleware/FreeRTOS": true,
+        "middleware/rtthread": true,
+        "middleware/EasyLogger/demo": true,
+        "middleware/EasyLogger/docs": true,
     },
     "files.watcherExclude": {
         "sample": true,
         "out": true,
+        "middleware/lc3plus": true,
+        "middleware/FreeRTOS": true,
+        "middleware/rtthread": true,
+        "middleware/EasyLogger/demo": true,
+        "middleware/EasyLogger/docs": true,
     },
     "files.associations": {
         "ch32v30x.h": "c",
         "core_riscv.h": "c"
     },
+    "C_Cpp.dimInactiveRegions": false,
 }

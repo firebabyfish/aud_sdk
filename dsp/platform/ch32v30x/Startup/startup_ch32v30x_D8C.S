@@ -1,9 +1,9 @@
 /********************************** (C) COPYRIGHT *******************************
-* File Name          : startup_ch32v30x.s
+* File Name          : startup_ch32v30x_D8C.s
 * Author             : WCH
-* Version            : V1.0.0
-* Date               : 2024/03/06
-* Description        : CH32V30x vector table for eclipse toolchain.
+* Version            : V1.0.1
+* Date               : 2025/04/06
+* Description        : CH32V307x-CH32V305x vector table for eclipse toolchain.
 *********************************************************************************
 * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
 * Attention: This software (modified or not) and binary are used for 
@@ -127,7 +127,6 @@ _vector_base:
     .word   DMA2_Channel11_IRQHandler  /* DMA2 Channel 11 */
 
     .option rvc;
-
     .section    .text.vector_handler, "ax", @progbits
     .weak   NMI_Handler                /* NMI */
     .weak   HardFault_Handler          /* Hard Fault */
@@ -327,13 +326,12 @@ DMA2_Channel11_IRQHandler:
 handle_reset:
 .option push 
 .option	norelax 
-    csrw mepc, t0
 	la gp, __global_pointer$
 .option	pop 
 
 	la sp, _eusrstack 
 
-	/* Load data section from flash to RAM */
+/* Load data section from flash to RAM */
 	la a0, _data_lma
 	la a1, _data_vma
 	la a2, _edata
@@ -345,7 +343,7 @@ handle_reset:
 	addi a1, a1, 4
 	bltu a1, a2, 1b
 2:
-	/* Clear bss section */
+/* Clear bss section */
 	la a0, _sbss
 	la a1, _ebss
 	bgeu a0, a1, 2f
@@ -357,14 +355,11 @@ handle_reset:
 /* Configure pipelining and instruction prediction */
     li t0, 0x1f
     csrw 0xbc0, t0
-
 /* Enable interrupt nesting and hardware stack */
-	li t0, 0x1f
+	li t0, 0x0b
 	csrw 0x804, t0
-#	csrw 0x804, zero
-
 /* Enable floating point and global interrupt, configure privileged mode */
-   	li t0, 0x7800
+   	li t0, 0x6088           
    	csrw mstatus, t0
 /* Configure the interrupt vector table recognition mode and entry address mode */
  	la t0, _vector_base

@@ -21,7 +21,19 @@
                 "middleware/FreeRTOS/portable/GCC/RISC-V/chip_specific_extensions/RV32I_PFIC_no_extensions",
                 "middleware/lc3plus/floating_point/inc",
                 "middleware/lc3plus/floating_point/fft",
-                "include"
+                "middleware/EasyLogger/easylogger/inc",
+                "bsp",
+                "bsp/clock",
+                "bsp/nvic",
+                "bsp/timer",
+                "bsp/dma",
+                "bsp/uart",
+                "bsp/usb",
+                "bsp/i2s",
+                "app/system",
+                "app/debug",
+                "app/delay",
+                "app/usb/device/uac"
             ]
         }
     ],

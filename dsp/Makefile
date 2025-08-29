@@ -14,7 +14,7 @@ include $(ROOT_DIR)/config/config.mk
 ######################################
 # build options
 ######################################
-DEBUG = -DDEBUG=0
+DEBUG ?= 
 LEVEL = -Os
 
 ######################################
@@ -25,14 +25,11 @@ BUILD_DIR = out
 ######################################
 # sources
 ######################################
-USER_C_SRC = \
-	src/main.c \
-	src/aud_i2s.c
+USER_C_SRC = 
 	
 C_SOURCES += $(USER_C_SRC)
 
-C_INCLUDES += \
-	-Iinclude
+C_INCLUDES += 
 
 ######################################
 # toolchain
@@ -82,26 +79,26 @@ all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET
 ######################################
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
-	@echo "CC      " "$<"
+	@echo "CC  " "$<"
 	@$(CC) $(CFLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<" 
 
 $(BUILD_DIR)/%.o: %.S Makefile | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
-	@echo "AS      " "$<"
+	@echo "AS  " "$<"
 	@$(AS) $(ASFLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
 
 $(BUILD_DIR)/$(TARGET).elf: $(OBJS) Makefile
-	@echo "LD      " "$@"
+	@echo "LD  " "$@"
 	@$(CC) $(OBJS) $(LDFLAGS) -o $@
-	@echo "SIZE    " "$@"
+	@echo "SZ  " "$@"
 	@$(SZ) $@
 
 $(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
-	@echo "OBJCOPY " "$@"
+	@echo "CP  " "$@"
 	@$(HEX) $< $@
 
 $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
-	@echo "OBJCOPY " "$@"
+	@echo "CP  " "$@"
 	@$(BIN) $< $@
 
 ######################################

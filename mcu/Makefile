@@ -25,14 +25,11 @@ BUILD_DIR = out
 ######################################
 # sources
 ######################################
-USER_C_SRC = \
-	src/aud_usb.c \
-	src/main.c
+USER_C_SRC = 
 	
 C_SOURCES += $(USER_C_SRC)
 
-C_INCLUDES += -Iinclude
-
+C_INCLUDES += 
 ######################################
 # toolchain
 ######################################

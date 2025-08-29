@@ -2,7 +2,7 @@
 * File Name          : system_ch32v30x.c
 * Author             : WCH
 * Version            : V1.0.0
-* Date               : 2024/03/05
+* Date               : 2021/06/06
 * Description        : CH32V30x Device Peripheral Access Layer System Source File.
 *                      For HSE = 8Mhz
 *********************************************************************************
@@ -137,14 +137,8 @@ void SystemInit (void)
  */
 void SystemCoreClockUpdate (void)
 {
-  uint32_t tmp = 0, pllmull = 0, pllsource = 0;
-  uint8_t Pll_6_5 = 0;
-
-#ifdef CH32V30x_D8C
-  uint8_t Pll2mull = 0;
-
-#endif
-
+  uint32_t tmp = 0, pllmull = 0, pllsource = 0, Pll_6_5 = 0;
+	
   tmp = RCC->CFGR0 & RCC_SWS;
   
   switch (tmp)
@@ -159,58 +153,39 @@ void SystemCoreClockUpdate (void)
       pllmull = RCC->CFGR0 & RCC_PLLMULL;
       pllsource = RCC->CFGR0 & RCC_PLLSRC; 
       pllmull = ( pllmull >> 18) + 2;
-
+	  
 #ifdef CH32V30x_D8
-      if(pllmull == 17) pllmull = 18;
+          if(pllmull == 17) pllmull = 18;
 #else
-      if(pllmull == 2) pllmull = 18;
-      if(pllmull == 15){
-          pllmull = 13;  /* *6.5 */
-          Pll_6_5 = 1;
-      }
-      if(pllmull == 16) pllmull = 15;
-      if(pllmull == 17) pllmull = 16;
+          if(pllmull == 2) pllmull = 18;
+          if(pllmull == 15){
+              pllmull = 13;  /* *6.5 */
+              Pll_6_5 = 1;
+          }
+          if(pllmull == 16) pllmull = 15;
+          if(pllmull == 17) pllmull = 16;
 #endif
-
+	  
       if (pllsource == 0x00)
       {
-          if(EXTEN->EXTEN_CTR & EXTEN_PLL_HSI_PRE) SystemCoreClock = HSI_VALUE * pllmull;
-          else SystemCoreClock = (HSI_VALUE >> 1) * pllmull;
+          if(EXTEN->EXTEN_CTR & EXTEN_PLL_HSI_PRE){
+              SystemCoreClock = (HSI_VALUE) * pllmull;
+          }
+          else{
+              SystemCoreClock = (HSI_VALUE >>1) * pllmull;
+          }
       }
       else
-      {
-
-#ifdef CH32V30x_D8
-          if ((RCC->CFGR0 & RCC_PLLXTPRE) != (uint32_t)RESET)
-          {
-            SystemCoreClock = (HSE_VALUE >> 1) * pllmull;
-          }
-          else
-          {
-            SystemCoreClock = HSE_VALUE * pllmull;
-          }
-
-#else
-          if(RCC->CFGR2 & (1<<16)){ /* PLL2 */
-              SystemCoreClock = HSE_VALUE/(((RCC->CFGR2 & 0xF0)>>4) + 1);  /* PREDIV2 */
-
-              Pll2mull = (uint8_t)((RCC->CFGR2 & 0xF00)>>8);
-
-              if(Pll2mull == 0) SystemCoreClock = (SystemCoreClock * 5)>>1;
-              else if(Pll2mull == 1) SystemCoreClock = (SystemCoreClock * 25)>>1;
-              else if(Pll2mull == 15) SystemCoreClock = SystemCoreClock * 20;
-              else  SystemCoreClock = SystemCoreClock * (Pll2mull + 2);
-
-              SystemCoreClock = SystemCoreClock/((RCC->CFGR2 & 0xF) + 1);  /* PREDIV1 */
-          }
-          else{/* HSE */
-              SystemCoreClock = HSE_VALUE/((RCC->CFGR2 & 0xF) + 1);  /* PREDIV1 */
-          }
-
-          SystemCoreClock = SystemCoreClock * pllmull;
-#endif
+      {    
+        if ((RCC->CFGR0 & RCC_PLLXTPRE) != (uint32_t)RESET)
+        {
+          SystemCoreClock = (HSE_VALUE >> 1) * pllmull;
+        }
+        else
+        {
+          SystemCoreClock = HSE_VALUE * pllmull;
+        }
       }
-
 
       if(Pll_6_5 == 1) SystemCoreClock = (SystemCoreClock / 2);
 
@@ -233,7 +208,6 @@ void SystemCoreClockUpdate (void)
  */
 static void SetSysClock(void)
 {
-  //GPIO_IPD_Unused();
 #ifdef SYSCLK_FREQ_HSE
     SetSysClockToHSE();
 #elif defined SYSCLK_FREQ_48MHz_HSE
@@ -265,7 +239,7 @@ static void SetSysClock(void)
  
  /* If none of the define above is enabled, the HSI is used as System clock
   * source (default after reset) 
-    */
+	*/ 
 }
 
 
@@ -320,9 +294,9 @@ static void SetSysClockToHSE(void)
   }
   else
   { 
-        /* If HSE fails to start-up, the application will have wrong clock
+		/* If HSE fails to start-up, the application will have wrong clock 
      * configuration. User can add here some code to deal with this error 
-         */
+		 */
   }  
 }
 
@@ -391,10 +365,10 @@ static void SetSysClockTo48_HSE(void)
   }
   else
   { 
-        /*
-         * If HSE fails to start-up, the application will have wrong clock
+		/* 
+		 * If HSE fails to start-up, the application will have wrong clock 
      * configuration. User can add here some code to deal with this error 
-         */
+		 */
   } 
 }
 
@@ -430,7 +404,7 @@ static void SetSysClockTo56_HSE(void)
   }  
 
   if (HSEStatus == (uint32_t)0x01)
-  {
+  {	
     /* HCLK = SYSCLK */
     RCC->CFGR0 |= (uint32_t)RCC_HPRE_DIV1;   
     /* PCLK2 = HCLK */
@@ -464,10 +438,10 @@ static void SetSysClockTo56_HSE(void)
   }
   else
   { 
-        /*
-         * If HSE fails to start-up, the application will have wrong clock
+		/* 
+		 * If HSE fails to start-up, the application will have wrong clock 
      * configuration. User can add here some code to deal with this error 
-         */
+		 */
   } 
 }
 
@@ -537,10 +511,10 @@ static void SetSysClockTo72_HSE(void)
   }
   else
   { 
-        /*
-         * If HSE fails to start-up, the application will have wrong clock
+		/* 
+		 * If HSE fails to start-up, the application will have wrong clock 
      * configuration. User can add here some code to deal with this error 
-         */
+		 */
   }
 }
 

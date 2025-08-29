@@ -1,8 +1,8 @@
 /********************************** (C) COPYRIGHT *******************************
 * File Name          : startup_ch32v30x_D8.s
 * Author             : WCH
-* Version            : V1.0.1
-* Date               : 2024/03/06
+* Version            : V1.0.2
+* Date               : 2025/03/06
 * Description        : CH32V303x vector table for eclipse toolchain.
 *********************************************************************************
 * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
@@ -306,7 +306,6 @@ DMA2_Channel11_IRQHandler:
 handle_reset:
 .option push
 .option	norelax
-    csrw mepc, t0
 	la gp, __global_pointer$
 .option	pop
 
@@ -337,12 +336,10 @@ handle_reset:
     li t0, 0x1f
     csrw 0xbc0, t0
 /* Enable interrupt nesting and hardware stack */
-	li t0, 0x1f
+	li t0, 0x0b
 	csrw 0x804, t0
-#	csrw 0x804, zero
-
 /* Enable floating point and global interrupt, configure privileged mode */
-   	li t0, 0x7800
+   	li t0, 0x6088
    	csrw mstatus, t0
 /* Configure the interrupt vector table recognition mode and entry address mode */
  	la t0, _vector_base
@@ -350,7 +347,7 @@ handle_reset:
 	csrw mtvec, t0
 
     jal  SystemInit
-	la t0, entry
+	la t0, main
 	csrw mepc, t0
 	mret
 

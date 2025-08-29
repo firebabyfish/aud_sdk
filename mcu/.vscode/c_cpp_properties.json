@@ -27,11 +27,14 @@
                 "middleware/CherryUSB/class/vendor/serial",
                 "middleware/CherryUSB/class/vendor/wifi",
                 "middleware/CherryUSB/class/aoa",
+                "middleware/EasyLogger/easylogger/inc",
                 "middleware/FreeRTOS/portable/GCC/RISC-V",
                 "middleware/FreeRTOS/include",
                 "platform/ch585/StdPeriphDriver/inc",
                 "platform/ch585/RVMSIS",
-                "include"
+                "bsp/inc/config",
+                "bsp/inc",
+                "app/inc"
             ]
         }
     ],
