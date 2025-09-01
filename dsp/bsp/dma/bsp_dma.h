@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 
+#define BSP_DMA_CH_USART1_TX DMA1_Channel4
 #define BSP_DMA_CH_USART2_TX DMA1_Channel7
 #define BSP_DMA_CH_I2S2_TX   DMA1_Channel5
 #define BSP_DMA_CH_I2S3_RX   DMA2_Channel1

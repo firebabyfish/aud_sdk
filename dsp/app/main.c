@@ -16,19 +16,21 @@ void app_usb_init(void);
 void app_usb_runloop(void);
 
 
-uint16_t i2s_temp_buf[10] = {0x1111, 0x2222, 0x3333, 0x4444, 0x5555, 0x6666, 0x7777, 0x8888, 0x9999, 0x0000};
-
-
 int main(void)
 {
+    // Initialize NVIC, system clock and timer
     app_system_init();
-    app_debug_init(921600);
+    // Initialize debug uart, use baudrate 3M for output in interrupt
+    app_debug_init(3000000);
+    // Initialize easylogger
     app_log_init();
+    // Initialize delay function
     app_delay_init();
-
+    // Initialize usb device: UAC1.0
     app_usb_init();
 
     while (1) {
+        // USB device tx and rx handler
         app_usb_runloop();
     }
 }

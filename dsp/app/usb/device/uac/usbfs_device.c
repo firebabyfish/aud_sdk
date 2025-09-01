@@ -215,10 +215,10 @@ void USBFS_IRQHandler(void)
     if (intflag & USBFS_UIF_TRANSFER) {
         switch (intst & USBFS_UIS_TOKEN_MASK) {
             /* data-in stage processing */
-            case USBFS_UIS_TOKEN_IN:
+            case USBFS_UIS_TOKEN_IN: {
                 switch (intst & (USBFS_UIS_TOKEN_MASK | USBFS_UIS_ENDP_MASK)) {
                     /* end-point 0 data in interrupt */
-                    case USBFS_UIS_TOKEN_IN | DEF_UEP0:
+                    case USBFS_UIS_TOKEN_IN | DEF_UEP0: {
                         if (USBFS_SetupReqLen == 0) {
                             USBFSD->UEP0_RX_CTRL = USBFS_UEP_R_TOG | USBFS_UEP_R_RES_ACK;
                         }
@@ -244,78 +244,91 @@ void USBFS_IRQHandler(void)
                             }
                         }
                         break;
-
+                    }
                     default:
                         break;
                 }
                 break;
+            }
 
             /* data-out stage processing */
-            case USBFS_UIS_TOKEN_OUT:
+            case USBFS_UIS_TOKEN_OUT: {
                 switch (intst & (USBFS_UIS_TOKEN_MASK | USBFS_UIS_ENDP_MASK)) {
                     /* end-point 0 data out interrupt */
                     case USBFS_UIS_TOKEN_OUT | DEF_UEP0: {
                         len = USBFSD->RX_LEN;
                         APP_LOG_INFO("EP 0 out %d data", USBFSD->RX_LEN);
-                        if (intst & USBFS_UIS_TOG_OK) {
-                            USBFS_SetupReqLen = 0;
-                            if ((USBFS_SetupReqType & USB_REQ_TYP_MASK) != USB_REQ_TYP_STANDARD) {
-                                if ((USBFS_SetupReqType & USB_REQ_TYP_MASK) == USB_REQ_TYP_CLASS) {
-                                    if ((USBFS_SetupReqType & USB_UAC_REQ_TYPE_MASK) == USB_UAC_REQ_TYPE_ID_INF) {
-                                        switch (USBFS_SetupReqCode) {
-                                            case UAC_SET_CUR:
-                                                /* Entity ID: 2 */
-                                                if (USBFS_SetupReqIndex == 0x0200) {
-                                                    switch ((USBFS_SetupReqValue >> 8) & 0xFF) {
-                                                        case UAC_CS_MUTE_CONTROL:
-                                                            uac_headphone_unit.feature_unit.mute = USBFS_EP0_Buf[0];
-                                                            break;
-                                                        case UAC_CS_VOLUME_CONTROL:
-                                                            if ((USBFS_SetupReqValue & 0xFF) == 0x01) {
-                                                                uac_headphone_unit.feature_unit.volume_l = USBFS_EP0_Buf[0] | (USBFS_EP0_Buf[1] << 8);
-                                                            } else if ((USBFS_SetupReqValue & 0xFF) == 0x02) {
-                                                                uac_headphone_unit.feature_unit.volume_r = USBFS_EP0_Buf[0] | (USBFS_EP0_Buf[1] << 8);
-                                                            } else {
-                                                                errflag = 0xFF;
-                                                            }
-                                                            break;
-                                                        default:
-                                                            errflag = 0xFF;
-                                                            break;
-                                                    }
+
+                        if (!(intst & USBFS_UIS_TOG_OK)) {
+                            if (USBFS_SetupReqLen == 0) {
+                                USBFSD->UEP0_TX_LEN  = 0;
+                                USBFSD->UEP0_TX_CTRL = USBFS_UEP_T_TOG | USBFS_UEP_T_RES_ACK;
+                            }
+                            break;
+                        }
+
+                        USBFS_SetupReqLen = 0;
+                        if ((USBFS_SetupReqType & USB_REQ_TYP_MASK) != USB_REQ_TYP_STANDARD) {
+                            if (!((USBFS_SetupReqType & USB_REQ_TYP_MASK) == USB_REQ_TYP_CLASS)) {
+                                if (USBFS_SetupReqLen == 0) {
+                                    USBFSD->UEP0_TX_LEN  = 0;
+                                    USBFSD->UEP0_TX_CTRL = USBFS_UEP_T_TOG | USBFS_UEP_T_RES_ACK;
+                                }
+                                break;
+                            }
+                            if ((USBFS_SetupReqType & USB_UAC_REQ_TYPE_MASK) == USB_UAC_REQ_TYPE_ID_INF) {
+                                switch (USBFS_SetupReqCode) {
+                                    case UAC_SET_CUR:
+                                        /* Entity ID: 2 */
+                                        if (USBFS_SetupReqIndex != 0x0200) {
+                                            errflag = 0xFF;
+                                        }
+                                        switch ((USBFS_SetupReqValue >> 8) & 0xFF) {
+                                            case UAC_CS_MUTE_CONTROL:
+                                                uac_headphone_unit.feature_unit.mute = USBFS_EP0_Buf[0];
+                                                break;
+                                            case UAC_CS_VOLUME_CONTROL:
+                                                if ((USBFS_SetupReqValue & 0xFF) == 0x01) {
+                                                    uac_headphone_unit.feature_unit.volume_l = USBFS_EP0_Buf[0] | (USBFS_EP0_Buf[1] << 8);
+                                                } else if ((USBFS_SetupReqValue & 0xFF) == 0x02) {
+                                                    uac_headphone_unit.feature_unit.volume_r = USBFS_EP0_Buf[0] | (USBFS_EP0_Buf[1] << 8);
                                                 } else {
                                                     errflag = 0xFF;
                                                 }
                                                 break;
-                                            case UAC_SET_MIN:
-                                            case UAC_SET_MAX:
-                                            case UAC_SET_RES:
-                                            case UAC_SET_MEM:
-                                                errflag = 0xFF;
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    } else if ((USBFS_SetupReqType & USB_UAC_REQ_TYPE_MASK) == USB_UAC_REQ_TYPE_ENDP) {
-                                        switch (USBFS_SetupReqCode) {
-                                            case UAC_CS_SAMPLING_FREQ_CONTROL:
-                                                /* add your code here */
-                                                break;
-                                            case UAC_CS_PITCH_CONTROL:
-                                                /* add your code here */
-                                                break;
                                             default:
                                                 errflag = 0xFF;
                                                 break;
                                         }
-                                    } else {
+                                        break;
+                                    case UAC_SET_MIN:
+                                    case UAC_SET_MAX:
+                                    case UAC_SET_RES:
+                                    case UAC_SET_MEM:
                                         errflag = 0xFF;
-                                    }
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else if ((USBFS_SetupReqType & USB_UAC_REQ_TYPE_MASK) == USB_UAC_REQ_TYPE_ENDP) {
+                                switch (USBFS_SetupReqCode) {
+                                    case UAC_CS_SAMPLING_FREQ_CONTROL:
+                                        /* add your code here */
+                                        break;
+                                    case UAC_CS_PITCH_CONTROL:
+                                        /* add your code here */
+                                        break;
+                                    default:
+                                        errflag = 0xFF;
+                                        break;
                                 }
                             } else {
-                                /* Standard request end-point 0 Data download */
-                                /* Add your code here */
+                                errflag = 0xFF;
                             }
+
+                        } else {
+                            /* Standard request end-point 0 Data download */
+                            /* Add your code here */
                         }
 
                         if (USBFS_SetupReqLen == 0) {
@@ -324,16 +337,14 @@ void USBFS_IRQHandler(void)
                         }
                     } break;
                     /* end-point 3 data out interrupt */
-                    case USBFS_UIS_TOKEN_OUT | DEF_UEP3:
+                    case USBFS_UIS_TOKEN_OUT | DEF_UEP3: {
                         if (intst & USBFS_UIS_TOG_OK) {
                             if (RingBuffer_Comm.RemainPack >= (DEF_RING_BUFFER_MAX_BLKS - 1)) {
                                 RingBuffer_Comm.PackLen[RingBuffer_Comm.LoadPtr] = (USBFSD->RX_LEN > DEF_USBD_FS_ISO_PACK_SIZE) ? DEF_USBD_FS_ISO_PACK_SIZE : USBFSD->RX_LEN;
                             } else {
                                 extern uint8_t app_usb_tx_buf[192];
-                                extern uint8_t is_usb_tx;
                                 uint8_t *temp_buf = (uint8_t *)(USBFSD->UEP3_DMA);
                                 memcpy(app_usb_tx_buf, temp_buf, 192);
-                                is_usb_tx = 1;
                                 APP_LOG_INFO("EP 3 out %d data", USBFSD->RX_LEN);
                                 RingBuffer_Comm.RemainPack++;
                                 RingBuffer_Comm.PackLen[RingBuffer_Comm.LoadPtr] = (USBFSD->RX_LEN > DEF_USBD_FS_ISO_PACK_SIZE) ? DEF_USBD_FS_ISO_PACK_SIZE : USBFSD->RX_LEN;
@@ -344,12 +355,12 @@ void USBFS_IRQHandler(void)
                                 USBFSD->UEP3_DMA = (uint32_t)(&Data_Buffer[(RingBuffer_Comm.LoadPtr * DEF_RING_BUFFER_PACK_SIZE) + DEF_TRANSPORT_HEADER_SIZE]);
                             }
                         }
-                        break;
+                    } break;
                 }
-                break;
+            } break;
 
             /* Setup stage processing */
-            case USBFS_UIS_TOKEN_SETUP:
+            case USBFS_UIS_TOKEN_SETUP: {
                 USBFSD->UEP0_TX_CTRL = USBFS_UEP_T_TOG | USBFS_UEP_T_RES_NAK;
                 USBFSD->UEP0_RX_CTRL = USBFS_UEP_R_TOG | USBFS_UEP_R_RES_NAK;
                 /* Store All Setup Values */
@@ -506,8 +517,8 @@ void USBFS_IRQHandler(void)
 
                                         /* Descriptor 2, Product String descriptor */
                                         case DEF_STRING_DESC_PROD:
-                                            pUSBFS_Descr = usb_descr_from_str(prod_info_str);
-                                            len          = 2 + strlen(prod_info_str) * 2;
+                                            pUSBFS_Descr = MyProdInfo;
+                                            len          = DEF_USBD_PROD_DESC_LEN;
                                             break;
 
                                         /* Descriptor 3, Serial-number String descriptor */
@@ -537,26 +548,26 @@ void USBFS_IRQHandler(void)
                             break;
 
                         /* Set usb address */
-                        case USB_SET_ADDRESS:
+                        case USB_SET_ADDRESS: {
                             USBFS_DevAddr = (uint8_t)(USBFS_SetupReqValue & 0xFF);
-                            break;
+                        } break;
 
                         /* Get usb configuration now set */
-                        case USB_GET_CONFIGURATION:
+                        case USB_GET_CONFIGURATION: {
                             USBFS_EP0_Buf[0] = USBFS_DevConfig;
                             if (USBFS_SetupReqLen > 1) {
                                 USBFS_SetupReqLen = 1;
                             }
-                            break;
+                        } break;
 
                         /* Set usb configuration to use */
-                        case USB_SET_CONFIGURATION:
+                        case USB_SET_CONFIGURATION: {
                             USBFS_DevConfig     = (uint8_t)(USBFS_SetupReqValue & 0xFF);
                             USBFS_DevEnumStatus = 0x01;
-                            break;
+                        } break;
 
                         /* Clear or disable one usb feature */
-                        case USB_CLEAR_FEATURE:
+                        case USB_CLEAR_FEATURE: {
                             if ((USBFS_SetupReqType & USB_REQ_RECIP_MASK) == USB_REQ_RECIP_DEVICE) {
                                 /* clear one device feature */
                                 if ((uint8_t)(USBFS_SetupReqValue & 0xFF) == USB_REQ_FEAT_REMOTE_WAKEUP) {
@@ -607,10 +618,10 @@ void USBFS_IRQHandler(void)
                             } else {
                                 errflag = 0xFF;
                             }
-                            break;
+                        } break;
 
                         /* set or enable one usb feature */
-                        case USB_SET_FEATURE:
+                        case USB_SET_FEATURE: {
                             if ((USBFS_SetupReqType & USB_REQ_RECIP_MASK) == USB_REQ_RECIP_DEVICE) {
                                 /* Set Device Feature */
                                 if ((uint8_t)(USBFS_SetupReqValue & 0xFF) == USB_REQ_FEAT_REMOTE_WAKEUP) {
@@ -668,7 +679,7 @@ void USBFS_IRQHandler(void)
                             } else {
                                 errflag = 0xFF;
                             }
-                            break;
+                        } break;
 
                         /* This request allows the host to select another setting for the specified interface  */
                         case USB_GET_INTERFACE:
@@ -683,7 +694,7 @@ void USBFS_IRQHandler(void)
                             break;
 
                         /* host get status of specified device/interface/end-points */
-                        case USB_GET_STATUS:
+                        case USB_GET_STATUS: {
                             USBFS_EP0_Buf[0] = 0x00;
                             USBFS_EP0_Buf[1] = 0x00;
                             if ((USBFS_SetupReqType & USB_REQ_RECIP_MASK) == USB_REQ_RECIP_DEVICE) {
@@ -739,8 +750,7 @@ void USBFS_IRQHandler(void)
                             if (USBFS_SetupReqLen > 2) {
                                 USBFS_SetupReqLen = 2;
                             }
-
-                            break;
+                        } break;
 
                         default:
                             errflag = 0xFF;
@@ -771,8 +781,7 @@ void USBFS_IRQHandler(void)
                         }
                     }
                 }
-                break;
-
+            } break;
             /* Sof pack processing */
             case USBFS_UIS_TOKEN_SOF:
                 break;

@@ -22,7 +22,6 @@ uac_headphone_unit_t uac_headphone_unit = {
 };
 
 volatile uint8_t tx_flag;
-uint8_t is_usb_tx = 0;
 
 
 uint16_t i2s_tx_buf[192];
@@ -79,13 +78,11 @@ void app_usb_uac_tx_handler(void)
     }
 #endif
 #ifdef APP_USB_TX_USE_I2S
-    if (is_usb_tx) {
-        is_usb_tx = 0;
-        bsp_dma_restart(BSP_DMA_CH_I2S2_TX, (uint32_t)&SPI2->DATAR, (uint32_t)app_usb_tx_buf, 96);
-    }
     p_data_pack_t p_data;
     if (tx_flag) {
         tx_flag = 0x00;
+        bsp_dma_restart(BSP_DMA_CH_I2S2_TX, (uint32_t)&SPI2->DATAR, (uint32_t)app_usb_tx_buf, 96);
+        // while ((!DMA_GetFlagStatus(DMA1_FLAG_TC5))) {};
     } else {
         if (RingBuffer_Comm.RemainPack) {
             p_data         = (p_data_pack_t)&Data_Buffer[(RingBuffer_Comm.DealPtr) * DEF_RING_BUFFER_PACK_SIZE];

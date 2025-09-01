@@ -1,7 +1,5 @@
 #include "app_usb_uac_desc.h"
 
-#include <string.h>
-
 
 /* Device Descriptor */
 const uint8_t MyDevDescr[] = {
@@ -152,23 +150,6 @@ const uint8_t MyCfgDescr[] = {
 const uint8_t MyLangDescr[] = {
     0x04, 0x03, 0x09, 0x04};
 
-const char *manu_info_str   = "wch.cn";
-const char *sernum_info_str = "012345789";
-
-uint8_t usb_descr[0xff];
-uint8_t *usb_descr_from_str(const char *str)
-{
-    uint16_t len = 2 + strlen(str) * 2;
-    usb_descr[0] = len;
-    usb_descr[1] = 0x03;
-    for (uint16_t i = 0; i < strlen(str); i++) {
-        usb_descr[2 + i * 2]     = str[i];
-        usb_descr[2 + i * 2 + 1] = 0;
-    }
-    usb_descr[len] = '\0';
-    return usb_descr;
-}
-
 /* Manufacturer Descriptor */
 const uint8_t MyManuInfo[] = {
     0x0E, 0x03, 'w', 0, 'c', 0, 'h', 0, '.', 0, 'c', 0, 'n', 0};
@@ -176,7 +157,7 @@ const uint8_t MyManuInfo[] = {
 /* Product Information */
 const uint8_t MyProdInfo[] = {
     0x28, 0x03,
-    'e', 0,
+    'W', 0,
     'C', 0,
     'H', 0,
     ' ', 0,

@@ -4,6 +4,9 @@
 void bsp_dma_cmd(DMA_Channel_TypeDef *dma_ch, uint8_t en)
 {
     switch ((uint32_t)dma_ch) {
+        case (uint32_t)BSP_DMA_CH_USART1_TX:
+            USART_DMACmd(USART1, USART_DMAReq_Tx, en);
+            break;
         case (uint32_t)BSP_DMA_CH_USART2_TX:
             USART_DMACmd(USART2, USART_DMAReq_Tx, en);
             break;
@@ -62,7 +65,7 @@ void bsp_dma_init(DMA_Channel_TypeDef *dma_ch, uint32_t peri_addr, uint32_t mem_
     DMA_InitStructure.DMA_M2M                = DMA_M2M_Disable;
 
     DMA_Init(dma_ch, &DMA_InitStructure);
-    // bsp_dma_cmd(dma_ch, ENABLE);
+    bsp_dma_cmd(dma_ch, ENABLE);
 }
 
 void bsp_dma_ctrl(DMA_Channel_TypeDef *dma_ch, uint8_t en)
