@@ -20,6 +20,11 @@ uac_headphone_unit_t uac_headphone_unit = {
     .feature_unit.volume_l = 0x0100,
     .feature_unit.volume_r = 0x0100,
 };
+uac_microphone_unit_t uac_microphone_unit = {
+    .feature_unit.mute     = 0,
+    .feature_unit.volume_l = 0x0100,
+    .feature_unit.volume_r = 0x0100,
+};
 
 volatile uint8_t tx_flag;
 

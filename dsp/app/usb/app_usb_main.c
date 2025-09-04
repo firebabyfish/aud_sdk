@@ -1,3 +1,4 @@
+#include "bsp_usb.h"
 #include "usbfs_device.h"
 #include "app_usb_uac_tx.h"
 
@@ -13,7 +14,7 @@ void app_usb_init(void)
     app_usb_uac_tx_init();
 
     /* USBFSD device init */
-    USBFS_RCC_Init();
+    bsp_usb_init();
     USBFS_Device_Init(ENABLE);
 }
 

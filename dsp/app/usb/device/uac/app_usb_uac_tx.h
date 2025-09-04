@@ -44,7 +44,17 @@ typedef struct {
     } feature_unit;
 } uac_headphone_unit_t;
 
+typedef struct {
+    struct {
+        uint8_t mute;
+        int16_t volume_l;
+        int16_t volume_r;
+    } feature_unit;
+} uac_microphone_unit_t;
+
+
 extern uac_headphone_unit_t uac_headphone_unit;
+extern uac_microphone_unit_t uac_microphone_unit;
 
 void app_usb_uac_tx_init(void);
 void app_usb_uac_tx_handler(void);

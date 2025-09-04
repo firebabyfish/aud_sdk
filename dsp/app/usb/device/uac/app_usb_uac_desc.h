@@ -10,7 +10,7 @@
 
 /* usb device info define  */
 #define DEF_USB_VID                  0x1A86
-#define DEF_USB_PID                  0xFE26
+#define DEF_USB_PID                  0xFE25
 
 /* USB device descriptor, device serial number(bcdDevice) */
 #define DEF_IC_PRG_VER               DEF_FILE_VERSION
@@ -41,22 +41,22 @@
 /******************************************************************************/
 /* usb device Descriptor length, length of usb descriptors, if one descriptor not
  * exists , set the length to 0  */
-#define DEF_USBD_DEVICE_DESC_LEN     ((uint8_t)MyDevDescr[0])
-#define DEF_USBD_CONFIG_DESC_LEN     ((uint16_t)MyCfgDescr[2] + (uint16_t)(MyCfgDescr[3] << 8))
+#define DEF_USBD_DEVICE_DESC_LEN     ((uint8_t)uac_dev_descr[0])
+#define DEF_USBD_CONFIG_DESC_LEN     ((uint16_t)uac_cfg_descr[2] + (uint16_t)(uac_cfg_descr[3] << 8))
 #define DEF_USBD_REPORT_DESC_LEN     0
-#define DEF_USBD_LANG_DESC_LEN       ((uint16_t)MyLangDescr[0])
-#define DEF_USBD_MANU_DESC_LEN       ((uint16_t)MyManuInfo[0])
-#define DEF_USBD_PROD_DESC_LEN       ((uint16_t)MyProdInfo[0])
-#define DEF_USBD_SN_DESC_LEN         ((uint16_t)MySerNumInfo[0])
+#define DEF_USBD_LANG_DESC_LEN       ((uint16_t)uac_lang_descr[0])
+#define DEF_USBD_MANU_DESC_LEN       ((uint16_t)uac_manu_info[0])
+#define DEF_USBD_PROD_DESC_LEN       ((uint16_t)uac_prod_info[0])
+#define DEF_USBD_SN_DESC_LEN         ((uint16_t)uac_serial_info[0])
 
 /******************************************************************************/
 /* external variables */
-extern const uint8_t MyDevDescr[ ];
-extern const uint8_t MyCfgDescr[ ];
-extern const uint8_t MyLangDescr[ ];
-extern const uint8_t MyManuInfo[ ];
-extern const uint8_t MyProdInfo[ ];
-extern const uint8_t MySerNumInfo[ ];
+extern const uint8_t uac_dev_descr[ ];
+extern const uint8_t uac_cfg_descr[ ];
+extern const uint8_t uac_lang_descr[ ];
+extern const uint8_t uac_manu_info[ ];
+extern const uint8_t uac_prod_info[ ];
+extern const uint8_t uac_serial_info[ ];
 
 uint8_t *usb_descr_from_str(const char *str);
 
