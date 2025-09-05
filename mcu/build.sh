@@ -1,6 +1,7 @@
 #!/bin/sh
 
 if [ $# -eq 0 ]; then
+	rm -rf out
 	make all -j
 	cp out/*.bin /mnt/d/work/workspace/wch/FLASH/
 	cp out/*.hex /mnt/d/work/workspace/wch/FLASH/

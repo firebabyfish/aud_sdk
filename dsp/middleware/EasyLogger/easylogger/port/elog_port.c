@@ -22,33 +22,23 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * Function: Portable interface for each platform.
+ * Function: Portable interface for non-os stm32f10x.
  * Created on: 2015-04-28
  */
- 
-#include <elog.h>
+
+#include "elog.h"
+#include <stdio.h>
 
 /**
  * EasyLogger port initialize
  *
  * @return result
  */
-ElogErrCode elog_port_init(void) {
+ElogErrCode elog_port_init(void)
+{
     ElogErrCode result = ELOG_NO_ERR;
 
-    /* add your code here */
-    
     return result;
-}
-
-/**
- * EasyLogger port deinitialize
- *
- */
-void elog_port_deinit(void) {
-
-    /* add your code here */
-
 }
 
 /**
@@ -57,28 +47,27 @@ void elog_port_deinit(void) {
  * @param log output of log
  * @param size log size
  */
-void elog_port_output(const char *log, size_t size) {
-    
-    /* add your code here */
-    
+void elog_port_output(const char *log, size_t size)
+{
+    /* output to terminal */
+    printf("%.*s", size, log);
+    //TODO output to flash
 }
 
 /**
  * output lock
  */
-void elog_port_output_lock(void) {
-    
-    /* add your code here */
-    
+void elog_port_output_lock(void)
+{
+    // __disable_irq();
 }
 
 /**
  * output unlock
  */
-void elog_port_output_unlock(void) {
-    
-    /* add your code here */
-    
+void elog_port_output_unlock(void)
+{
+    // __enable_irq();
 }
 
 /**
@@ -86,10 +75,12 @@ void elog_port_output_unlock(void) {
  *
  * @return current time
  */
-const char *elog_port_get_time(void) {
-    
-    /* add your code here */
-    
+const char *elog_port_get_time(void)
+{
+    extern volatile uint32_t heart_beat;
+    static char time_str[11];  // "t/XXXXXXXX" + '\0'
+    snprintf(time_str, sizeof(time_str), "t/%08X", heart_beat);
+    return time_str;
 }
 
 /**
@@ -97,10 +88,9 @@ const char *elog_port_get_time(void) {
  *
  * @return current process name
  */
-const char *elog_port_get_p_info(void) {
-    
-    /* add your code here */
-    
+const char *elog_port_get_p_info(void)
+{
+    return "pid:1008";
 }
 
 /**
@@ -108,8 +98,7 @@ const char *elog_port_get_p_info(void) {
  *
  * @return current thread name
  */
-const char *elog_port_get_t_info(void) {
-    
-    /* add your code here */
-    
+const char *elog_port_get_t_info(void)
+{
+    return "tid:24";
 }

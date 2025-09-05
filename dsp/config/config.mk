@@ -9,5 +9,9 @@ CODEC := none
 
 EASYLOGGER_ENABLE := y
 
+CHERRYUSB_ENABLE := y
+# v1, v2
+USB_AUDIO := v1
+
 include $(ROOT_DIR)/config/platform.mk
 include $(ROOT_DIR)/config/modules.mk

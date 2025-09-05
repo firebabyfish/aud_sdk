@@ -8,10 +8,9 @@ extern "C" {
 #include <stdint.h>
 
 
-typedef void (*bsp_usb_delay_cb_t)(uint32_t);
-
-
 void bsp_usb_init(void);
+void bsp_usb_irq_enable(void);
+
 
 #ifdef __cplusplus
 }

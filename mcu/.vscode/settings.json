@@ -22,7 +22,7 @@
         "middleware/CherryUSB/port/xhci": true,
         "middleware/CherryUSB/port/ch32/ch32fs": true,
         "middleware/CherryUSB/port/ch32/ch32hs": true,
-        "middleware/CherryUSB/demo": true,
+        "middleware/CherryUSB/demo": false,
         "middleware/CherryUSB/port/ch32/ch58x/usb_ch585_usbhs_dc.c": true,
         "middleware/FreeRTOS": true,
         "middleware/EasyLogger/demo": true,

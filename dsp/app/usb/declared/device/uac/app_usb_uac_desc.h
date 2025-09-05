@@ -1,0 +1,63 @@
+#ifndef USER_USB_DESC_H_
+#define USER_USB_DESC_H_
+
+#include <stdint.h>
+
+/******************************************************************************/
+/* global define */
+/* file version */
+#define DEF_FILE_VERSION             0x01
+
+/* usb device info define  */
+#define DEF_USB_VID                  0x1A86
+#define DEF_USB_PID                  0xFE25
+
+/* USB device descriptor, device serial number(bcdDevice) */
+#define DEF_IC_PRG_VER               DEF_FILE_VERSION
+
+/******************************************************************************/
+/* usb device endpoint size define */
+#define DEF_USBD_UEP0_SIZE           64     /* usb hs/fs device end-point 0 size */
+/* HS */
+#define DEF_USBD_HS_PACK_SIZE        512    /* usb hs device max bluk/int pack size */
+#define DEF_USBD_HS_ISO_PACK_SIZE    1024   /* usb hs device max iso pack size */
+/* FS */
+#define DEF_USBD_FS_PACK_SIZE        64     /* usb fs device max bluk/int pack size */
+#define DEF_USBD_FS_ISO_PACK_SIZE    192   /* usb fs device max iso pack size */
+/* LS */
+#define DEF_USBD_LS_UEP0_SIZE        8      /* usb ls device end-point 0 size */
+#define DEF_USBD_LS_PACK_SIZE        64     /* usb ls device max int pack size */
+
+/* FS end-point size */
+#define DEF_USBD_EP1_FS_SIZE         DEF_USBD_FS_PACK_SIZE
+#define DEF_USBD_EP2_FS_SIZE         DEF_USBD_FS_ISO_PACK_SIZE
+#define DEF_USBD_EP3_FS_SIZE         DEF_USBD_FS_ISO_PACK_SIZE
+#define DEF_USBD_EP4_FS_SIZE         DEF_USBD_FS_PACK_SIZE
+#define DEF_USBD_EP5_FS_SIZE         DEF_USBD_FS_PACK_SIZE
+#define DEF_USBD_EP6_FS_SIZE         DEF_USBD_FS_PACK_SIZE
+/* LS end-point size */
+/* ... */
+
+/******************************************************************************/
+/* usb device Descriptor length, length of usb descriptors, if one descriptor not
+ * exists , set the length to 0  */
+#define DEF_USBD_DEVICE_DESC_LEN     ((uint8_t)uac_dev_descr[0])
+#define DEF_USBD_CONFIG_DESC_LEN     ((uint16_t)uac_cfg_descr[2] + (uint16_t)(uac_cfg_descr[3] << 8))
+#define DEF_USBD_REPORT_DESC_LEN     0
+#define DEF_USBD_LANG_DESC_LEN       ((uint16_t)uac_lang_descr[0])
+#define DEF_USBD_MANU_DESC_LEN       ((uint16_t)uac_manu_info[0])
+#define DEF_USBD_PROD_DESC_LEN       ((uint16_t)uac_prod_info[0])
+#define DEF_USBD_SN_DESC_LEN         ((uint16_t)uac_serial_info[0])
+
+/******************************************************************************/
+/* external variables */
+extern const uint8_t uac_dev_descr[ ];
+extern const uint8_t uac_cfg_descr[ ];
+extern const uint8_t uac_lang_descr[ ];
+extern const uint8_t uac_manu_info[ ];
+extern const uint8_t uac_prod_info[ ];
+extern const uint8_t uac_serial_info[ ];
+
+uint8_t *usb_descr_from_str(const char *str);
+
+#endif /* USER_USB_DESC_H_ */

@@ -22,6 +22,22 @@
                 "middleware/lc3plus/floating_point/inc",
                 "middleware/lc3plus/floating_point/fft",
                 "middleware/EasyLogger/easylogger/inc",
+                "middleware/CherryUSB/common",
+                "middleware/CherryUSB/core",
+                "middleware/CherryUSB/class/hub",
+                "middleware/CherryUSB/class/cdc",
+                "middleware/CherryUSB/class/hid",
+                "middleware/CherryUSB/class/msc",
+                "middleware/CherryUSB/class/audio",
+                "middleware/CherryUSB/class/video",
+                "middleware/CherryUSB/class/wireless",
+                "middleware/CherryUSB/class/midi",
+                "middleware/CherryUSB/class/adb",
+                "middleware/CherryUSB/class/dfu",
+                "middleware/CherryUSB/class/vendor/net",
+                "middleware/CherryUSB/class/vendor/serial",
+                "middleware/CherryUSB/class/vendor/wifi",
+                "middleware/CherryUSB/class/aoa",
                 "bsp",
                 "bsp/clock",
                 "bsp/nvic",
@@ -33,7 +49,8 @@
                 "app/system",
                 "app/debug",
                 "app/delay",
-                "app/usb/device/uac"
+                "app/usb",
+                "app/usb/audio_v1"
             ]
         }
     ],

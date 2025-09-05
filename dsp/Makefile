@@ -77,10 +77,15 @@ all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET
 ######################################
 # build rules
 ######################################
+# $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
+# 	@mkdir -p $(dir $@)
+# 	@echo "CC  " "$<"
+# 	@$(CC) $(CFLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	@echo "CC  " "$<"
-	@$(CC) $(CFLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<" 
+	@$(CC) $(CFLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
+	@$(CC) $(CFLAGS) -E "$<" -o "$(@:%.o=%.i)"
 
 $(BUILD_DIR)/%.o: %.S Makefile | $(BUILD_DIR)
 	@mkdir -p $(dir $@)

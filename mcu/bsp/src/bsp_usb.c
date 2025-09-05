@@ -37,14 +37,14 @@
 #define AUDIO_IN_FU_ID     0x07
 
 #define AUDIO_OUT_MAX_FREQ 96000
-#define AUDIO_IN_MAX_FREQ  16000
+#define AUDIO_IN_MAX_FREQ  48000
 
 #define HALF_WORD_BYTES 2   //2 half word (one channel)
 #define SAMPLE_BITS     16  //16 bit per channel
 
 #define BMCONTROL (AUDIO_V2_FU_CONTROL_MUTE | AUDIO_V2_FU_CONTROL_VOLUME)
 
-#define IN_CHANNEL_NUM 2
+#define IN_CHANNEL_NUM 1
 
 #if IN_CHANNEL_NUM == 1
 #define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL)
@@ -183,9 +183,9 @@ static const uint8_t device_quality_descriptor[] = {
 
 static const char *string_descriptors[] = {
     (const char[]){0x09, 0x04}, /* Langid */
-    "CherryUSB",                /* Manufacturer */
-    "CherryUSB UAC DEMO",       /* Product */
-    "2022123456",               /* Serial Number */
+    "Csquare",                  /* Manufacturer */
+    "CS Gaming Headset",        /* Product */
+    "2025090511",               /* Serial Number */
 };
 
 static const uint8_t *device_descriptor_callback(uint8_t speed)
@@ -239,8 +239,8 @@ static const uint8_t speaker_default_sampling_freq_table[] = {
 
 static const uint8_t mic_default_sampling_freq_table[] = {
     AUDIO_SAMPLE_FREQ_NUM(1),
-    AUDIO_SAMPLE_FREQ_4B(16000),
-    AUDIO_SAMPLE_FREQ_4B(16000),
+    AUDIO_SAMPLE_FREQ_4B(48000),
+    AUDIO_SAMPLE_FREQ_4B(48000),
     AUDIO_SAMPLE_FREQ_4B(0x00),
 };
 

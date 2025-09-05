@@ -234,7 +234,9 @@ void elog_hexdump(const char *name, uint8_t width, const void *buf, uint16_t siz
  * NOTE: The `LOG_TAG` and `LOG_LVL` must defined before including the <elog.h> when you want to use log_x API.
  */
 #if !defined(LOG_TAG)
-    #define LOG_TAG          "NO_TAG"
+    #define ELOG_STRINGIFY(x) ELOG_STRINGIFY2(x)
+    #define ELOG_STRINGIFY2(x) #x
+    #define LOG_TAG  __FILE__ ":" ELOG_STRINGIFY(__LINE__)
 #endif
 #if !defined(LOG_LVL)
     #define LOG_LVL          ELOG_LVL_VERBOSE

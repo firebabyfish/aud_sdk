@@ -13,5 +13,9 @@ ifeq ($(EASYLOGGER_ENABLE), y)
 include $(ROOT_DIR)/middleware/EasyLogger/module.mk
 endif
 
+ifeq ($(CHERRYUSB_ENABLE), y)
+include $(ROOT_DIR)/middleware/CherryUSB/module.mk
+endif
+
 include $(ROOT_DIR)/bsp/module.mk
 include $(ROOT_DIR)/app/module.mk

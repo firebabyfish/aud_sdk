@@ -37,7 +37,9 @@
             "elog.h": "c",
             "elog_cfg.h": "c",
             "debug.h": "c",
-            "bsp_dma.h": "c"
+            "bsp_dma.h": "c",
+            "usbd_core.h": "c",
+            "app_log.h": "c"
         }
     }
 }
